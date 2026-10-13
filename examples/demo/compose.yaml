@@ -1,0 +1,7 @@
+# Synthetic fixture only: do not run this image.
+services:
+  game:
+    image: ghcr.io/example/demo-server:1.0.0@sha256:3333333333333333333333333333333333333333333333333333333333333333
+    platform: linux/amd64
+    volumes:
+      - ./world:/data

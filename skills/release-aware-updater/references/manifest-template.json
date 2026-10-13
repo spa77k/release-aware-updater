@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "demo-plugin",
+      "kind": "minecraft-plugin",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "url": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "verification": "unverified",
+        "evidence": "REPLACE: record the official source and the exact artifact/digest verification performed."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-plugin/1.1.0",
+            "summary": "REPLACE: summarize the reviewed upgrade path and link official notes, including intervening releases."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "Minecraft 1.21.x / Paper / Java 21 / no companion plugins (fictional)",
+            "result": "unknown",
+            "evidence": "REPLACE: verify the real runtime and dependency requirements using official evidence."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "PENDING: list relevant checks and replace with actual results as they run."
+        ],
+        "rollback": [
+          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+        ],
+        "decision": "blocked",
+        "blockers": [
+          "Template only: replace all example URLs, hashes, versions, paths, pin snippets, and review evidence before use."
+        ]
+      },
+      "edits": [
+        {
+          "path": "plugins.json",
+          "before": "\"version\": \"1.0.0\"",
+          "after": "\"version\": \"1.1.0\""
+        },
+        {
+          "path": "plugins.json",
+          "before": "https://downloads.example.invalid/demo-plugin/1.0.0/demo.jar",
+          "after": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar"
+        },
+        {
+          "path": "plugins.json",
+          "before": "1111111111111111111111111111111111111111111111111111111111111111",
+          "after": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ]
+    },
+    {
+      "id": "demo-server",
+      "kind": "docker-image",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "reference": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "platform": "linux/amd64",
+        "digest_kind": "index",
+        "verification": "unverified",
+        "evidence": "REPLACE: record the official source and the exact artifact/digest verification performed."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-server/1.1.0",
+            "summary": "REPLACE: summarize the reviewed upgrade path and link official notes, including intervening releases."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "linux/amd64 / Java 21 / unchanged volume schema and environment contract (fictional)",
+            "result": "unknown",
+            "evidence": "REPLACE: verify the real runtime and dependency requirements using official evidence."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "PENDING: list relevant checks and replace with actual results as they run."
+        ],
+        "rollback": [
+          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+        ],
+        "decision": "blocked",
+        "blockers": [
+          "Template only: replace all example URLs, hashes, versions, paths, pin snippets, and review evidence before use."
+        ]
+      },
+      "edits": [
+        {
+          "path": "compose.yaml",
+          "before": "ghcr.io/example/demo-server:1.0.0@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "after": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "demo-plugin",
+      "kind": "minecraft-plugin",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "url": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "verification": "verified",
+        "evidence": "SYNTHETIC FIXTURE: placeholder SHA-256, no download or real publisher verification. Never reuse as production evidence."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-plugin/1.1.0",
+            "summary": "Synthetic fixture: fixes login handling; adds an optional metrics setting. No incompatible changes in the fixture release."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "Minecraft 1.21.x / Paper / Java 21 / no companion plugins (fictional)",
+            "result": "pass",
+            "evidence": "Synthetic compatibility statement for offline demonstration only."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "Pending in a real task: validate configuration, isolate startup, and smoke-test login. Fixture tests only check pin editing."
+        ],
+        "rollback": [
+          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+        ],
+        "decision": "ready",
+        "blockers": []
+      },
+      "edits": [
+        {
+          "path": "plugins.json",
+          "before": "\"version\": \"1.0.0\"",
+          "after": "\"version\": \"1.1.0\""
+        },
+        {
+          "path": "plugins.json",
+          "before": "https://downloads.example.invalid/demo-plugin/1.0.0/demo.jar",
+          "after": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar"
+        },
+        {
+          "path": "plugins.json",
+          "before": "1111111111111111111111111111111111111111111111111111111111111111",
+          "after": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ]
+    },
+    {
+      "id": "demo-server",
+      "kind": "docker-image",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "reference": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "platform": "linux/amd64",
+        "digest_kind": "index",
+        "verification": "verified",
+        "evidence": "SYNTHETIC FIXTURE: placeholder registry index digest, no real registry inspection."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-server/1.1.0",
+            "summary": "Synthetic fixture: fixes login handling; adds an optional metrics setting. No incompatible changes in the fixture release."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "linux/amd64 / Java 21 / unchanged volume schema and environment contract (fictional)",
+            "result": "pass",
+            "evidence": "Synthetic compatibility statement for offline demonstration only."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "Pending in a real task: validate configuration, isolate startup, and smoke-test login. Fixture tests only check pin editing."
+        ],
+        "rollback": [
+          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+        ],
+        "decision": "ready",
+        "blockers": []
+      },
+      "edits": [
+        {
+          "path": "compose.yaml",
+          "before": "ghcr.io/example/demo-server:1.0.0@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "after": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        }
+      ]
+    }
+  ]
+}

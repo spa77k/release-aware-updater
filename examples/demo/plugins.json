@@ -1,0 +1,8 @@
+{
+  "notice": "Synthetic fixture only; this demo file is not a plugin loader.",
+  "demo-plugin": {
+    "version": "1.0.0",
+    "url": "https://downloads.example.invalid/demo-plugin/1.0.0/demo.jar",
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  }
+}
