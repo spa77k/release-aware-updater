@@ -1,6 +1,6 @@
 ---
 name: release-aware-updater
-description: Review upstream release notes and compatibility before updating applications, libraries, package dependencies, or Docker images. Produce an evidence-backed plan, minimal diff, validation, and rollback steps. Use for dependency upgrades and リリースノートを読んで更新. Minecraft plugins are an optional specialization; deployment is separate.
+description: Review upstream release notes and compatibility before updating applications, libraries, package dependencies, or Docker images. Produce an evidence-backed plan, minimal diff, validation, and rollback steps. Use for dependency upgrades, リリースノートを読んで更新, 릴리스 노트 기반 업데이트, and 根据发行说明更新依赖。 Minecraft plugins are an optional specialization; deployment is separate.
 license: MIT
 ---
 
@@ -13,6 +13,31 @@ services, migrate data, or deploy.
 
 Use any agent with file and web/repository reading tools. The optional helper
 requires Python 3.11+, with no extra packages or Docker daemon.
+
+## Language
+
+Support Japanese (`ja`), English (`en`), Korean (`ko`), and Simplified Chinese
+(`zh-CN`). Use the user's explicitly requested output language; otherwise match
+their request's language. For mixed-language requests without a clear preference,
+use the dominant language, or English when unclear. Do not infer language from
+upstream release notes. If the user requests another language or Chinese script,
+honor it in agent-written prose; the helper's built-in report labels support only
+the four listed locales.
+
+Write recommendations, release-note summaries, blockers, migration/rollback
+instructions, and test status in that language. Preserve exact identifiers, API
+names, paths, commands, versions, URLs, hashes, JSON keys/enums, and quoted source
+text. Distinguish translated summaries from original quotations. Preserve
+uncertainty and safety boundaries in every language.
+
+For helper plans, write human-readable manifest evidence in the selected language
+and add `--lang ja|en|ko|zh-CN` (one value) to `plan`. This localizes Markdown
+labels and the safety notice only; it does not translate supplied evidence,
+generated blocker diagnostics, or diffs. JSON and CLI help/diagnostics stay in
+English and the default report remains English. Explain technical status values
+such as `ready`, `blocked`, and `unknown` in the user's language when presenting
+the result. Reference documents below remain the shared English technical contract;
+explain relevant details in the user's language instead of requiring them to read it.
 
 ## Establish the actual target
 

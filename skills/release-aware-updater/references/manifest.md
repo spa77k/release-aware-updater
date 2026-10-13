@@ -90,6 +90,14 @@ python3 <skill-dir>/scripts/update.py rollback --root <repo> --plan <plan.json>
 python3 <skill-dir>/scripts/update.py sha256 <local-file> --expected <sha256>
 ```
 
+Use `plan --lang en|ja|ko|zh-CN` (choose one value) to select English, Japanese,
+Korean, or Simplified Chinese Markdown labels and safety notice. Default: `en`.
+Write evidence/summary text in the intended report language before planning;
+the helper does not translate input text, blocker diagnostics, or diffs. JSON
+schema/keys/enums, CLI help/diagnostics, exit codes, and all validation/apply/
+rollback behavior remain language-independent. `ready` means local pin edits
+passed the supplied-evidence gate; it never grants deployment permission.
+
 Plan creates two new files: the requested JSON and a same-stem `.md` report.
 Existing outputs are never overwritten. Exit codes: `0` success/ready, `1`
 validation or I/O error, `2` a successfully generated blocked plan. JSON and

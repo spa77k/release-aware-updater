@@ -1,5 +1,7 @@
 # Release-aware updater
 
+[日本語](README.md) | [English](README.en.md) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md)
+
 リリースノートを読み、互換性・破壊的変更・移行手順を確認してから
 アプリ・ライブラリ・パッケージ依存関係・Dockerイメージを更新する汎用スキルです。
 Minecraftプラグインも、用途のひとつとして扱えます。
@@ -11,6 +13,17 @@ Claude専用フックには依存しません。
 **Release-note-aware dependency updates, for any agent.** The agent researches
 official release notes; an optional offline Python helper creates reviewable pin
 diffs, applies authorized local edits, and reverses unchanged pin updates.
+
+## 対応言語
+
+日本語・英語・韓国語・簡体字中国語で、エージェントの更新案や説明を利用できます。
+希望する言語を指定するか、その言語で依頼してください。
+`plan --lang ja` / `--lang en` / `--lang ko` / `--lang zh-CN` でMarkdownレポートの
+見出し・項目名・安全性の注意書きを切り替えられます。省略時は英語です。
+入力した証拠の文章・自動生成された保留理由・差分は自動翻訳しません。
+JSONのキーと状態値、CLIのヘルプと診断メッセージは英語のままです。
+共通の技術仕様書は英語で、必要な内容をエージェントが利用者の言語で説明します。
+言語によって検証条件や実行権限は変わりません。
 
 ## できること
 
@@ -96,7 +109,7 @@ Python CLIを直接使えます。全ホストの自動検出を保証するも�
 demo=$(mktemp -d)
 cp -R examples/general "$demo/repo"
 python3 skills/release-aware-updater/scripts/update.py plan \
-  --root "$demo/repo" --manifest examples/general-manifest.json --out "$demo/plan.json"
+  --root "$demo/repo" --manifest examples/general-manifest.json --out "$demo/plan.json" --lang ja
 cat "$demo/plan.md"
 python3 skills/release-aware-updater/scripts/update.py apply \
   --root "$demo/repo" --plan "$demo/plan.json"
@@ -134,7 +147,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
 ネットワーク不要。正常な計画/適用/復元、保留判定、入力不正、曖昧な置換、
-パス逸脱、symlink、改変ファイル、CRLF、二重実行などを確認します。
+パス逸脱、symlink、改変ファイル、CRLF、二重実行、言語に依存しない動作などを確認します。
 入出力ファイルの1 MiB上限はUTF-8のバイト数で検査し、変更後に復元できない
 サイズへ増える更新は拒否します。生成planは読み込み可能な8 MiB以下に制限します。
 `__pycache__` とPythonバイトコードは配布対象から除外しています。

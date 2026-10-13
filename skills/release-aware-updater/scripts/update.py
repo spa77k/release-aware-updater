@@ -224,24 +224,63 @@ def prose(value):
     return re.sub(r"([\\`*_{}\[\]()<>#+.!|~-])", r"\\\1", value)
 
 
-def report(plan):
-    lines = ["# Release-aware update plan", "", f"Status: **{plan['status']}**", "",
-             "Readiness reflects supplied evidence, not independent verification or deployment approval.", ""]
+# Presentation only: schemas, decisions, evidence, diagnostics, and diffs stay unchanged.
+REPORT_TEXT = {
+    "en": {
+        "title": "Release-aware update plan", "status": "Status",
+        "notice": "Readiness reflects supplied evidence, not independent verification or deployment approval.",
+        "blockers": "Blockers", "artifact": "Artifact", "release_notes": "Release notes",
+        "compatibility": "Compatibility", "breaking_changes": "Breaking Changes",
+        "migrations": "Migrations", "tests": "Tests", "rollback": "Rollback",
+        "none": "None recorded", "diff": "Diff",
+    },
+    "ja": {
+        "title": "リリースノートに基づく更新計画", "status": "状態",
+        "notice": "更新可否は入力された証拠に基づきます。独立した検証やデプロイの承認ではありません。",
+        "blockers": "保留の理由", "artifact": "配布物", "release_notes": "リリースノート",
+        "compatibility": "互換性", "breaking_changes": "破壊的変更",
+        "migrations": "移行手順", "tests": "テスト", "rollback": "復元手順",
+        "none": "記録なし", "diff": "差分",
+    },
+    "ko": {
+        "title": "릴리스 노트 기반 업데이트 계획", "status": "상태",
+        "notice": "업데이트 가능 여부는 입력된 근거에 기반합니다. 독립적인 검증이나 배포 승인을 의미하지 않습니다.",
+        "blockers": "보류 사유", "artifact": "배포물", "release_notes": "릴리스 노트",
+        "compatibility": "호환성", "breaking_changes": "호환성을 깨뜨리는 변경 사항",
+        "migrations": "마이그레이션", "tests": "테스트", "rollback": "롤백",
+        "none": "기록 없음", "diff": "변경 내역",
+    },
+    "zh-CN": {
+        "title": "基于发行说明的更新计划", "status": "状态",
+        "notice": "可更新状态仅依据所提供的证据，不代表已完成独立验证或已获部署授权。",
+        "blockers": "暂缓原因", "artifact": "发布产物", "release_notes": "发行说明",
+        "compatibility": "兼容性", "breaking_changes": "破坏性变更",
+        "migrations": "迁移步骤", "tests": "测试", "rollback": "回滚步骤",
+        "none": "未记录", "diff": "差异",
+    },
+}
+
+
+def report(plan, lang="en"):
+    require(lang in REPORT_TEXT, "unsupported report language")
+    labels = REPORT_TEXT[lang]
+    lines = [f"# {labels['title']}", "", f"{labels['status']}: **{plan['status']}**", "",
+             labels["notice"], ""]
     if plan["blockers"]:
-        lines += ["## Blockers", *[f"- {prose(x)}" for x in plan["blockers"]], ""]
+        lines += [f"## {labels['blockers']}", *[f"- {prose(x)}" for x in plan["blockers"]], ""]
     for c in plan["manifest"]["components"]:
         r = c["review"]
         lines += [f"## {c['id']}", f"{prose(c['current_version'])} → {prose(c['candidate_version'])} ({c['kind']})", "",
-                  "Artifact: " + prose(json.dumps(c["artifact"], ensure_ascii=False)), "", "### Release notes"]
+                  labels["artifact"] + ": " + prose(json.dumps(c["artifact"], ensure_ascii=False)), "", f"### {labels['release_notes']}"]
         lines += [f"- {prose(n['url'])}: {prose(n['summary'])}" for n in r["release_notes"]]
-        lines += ["", "### Compatibility"] + [f"- {prose(x['target'])}: {x['result']} — {prose(x['evidence'])}" for x in r["compatibility"]]
+        lines += ["", f"### {labels['compatibility']}"] + [f"- {prose(x['target'])}: {x['result']} — {prose(x['evidence'])}" for x in r["compatibility"]]
         for key in ("breaking_changes", "migrations", "tests", "rollback"):
-            lines += ["", f"### {key.replace('_', ' ').title()}"]
-            lines += [f"- {prose(x)}" for x in r[key]] or ["- None recorded"]
+            lines += ["", f"### {labels[key]}"]
+            lines += [f"- {prose(x)}" for x in r[key]] or [f"- {labels['none']}"]
         lines.append("")
     for item in plan["files"]:
         fence = "`" * max(3, max((len(x) + 1 for x in re.findall(r"`+", item["diff"])), default=0))
-        lines += [f"## Diff: {prose(item['path'])}", "", fence + "diff", item["diff"].rstrip(), fence, ""]
+        lines += [f"## {labels['diff']}: {prose(item['path'])}", "", fence + "diff", item["diff"].rstrip(), fence, ""]
     return "\n".join(lines)
 
 
@@ -312,6 +351,8 @@ def main(argv=None):
     p.add_argument("--root", required=True, type=Path)
     p.add_argument("--manifest", required=True, type=Path)
     p.add_argument("--out", required=True, type=Path, help="new JSON plan path; adjacent .md report is also created")
+    p.add_argument("--lang", choices=tuple(REPORT_TEXT), default="en",
+                   help="Markdown report language (default: en); supplied evidence and JSON are unchanged")
     for name in ("apply", "rollback"):
         p = sub.add_parser(name, help="change local pin files from a reviewed plan; no deploy or commands")
         p.add_argument("--root", required=True, type=Path)
@@ -337,7 +378,7 @@ def main(argv=None):
             require(args.out != markdown, "--out must not end in .md")
             require(not args.out.exists() and not args.out.is_symlink() and not markdown.exists() and not markdown.is_symlink(), "output already exists; choose new paths")
             save_new(args.out, encode_plan(plan))
-            save_new(markdown, report(plan))
+            save_new(markdown, report(plan, args.lang))
             print(f"{plan['status']}: {args.out} and {markdown}")
             return 2 if plan["blockers"] else 0
         count = mutate(root, load(args.plan), reverse=args.command == "rollback")

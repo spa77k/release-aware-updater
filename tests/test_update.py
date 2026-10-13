@@ -33,6 +33,65 @@ class UpdateTest(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             return updater.main(list(map(str, args)))
 
+    def test_localized_plan_reports_preserve_json_and_round_trip(self):
+        expected = updater.encode_plan(self.plan())
+        for lang in ("en", "ja", "ko", "zh-CN"):
+            with self.subTest(lang=lang):
+                out = self.work / f"plan-{lang}.json"
+                manifest = self.work / f"manifest-{lang}.json"
+                manifest.write_text(json.dumps(self.manifest), encoding="utf-8")
+                self.assertEqual(self.cli("plan", "--root", self.root, "--manifest", manifest,
+                                          "--out", out, "--lang", lang), 0)
+                self.assertEqual(out.read_text(encoding="utf-8"), expected)
+                report = out.with_suffix(".md").read_text(encoding="utf-8")
+                for key, value in updater.REPORT_TEXT[lang].items():
+                    if key != "blockers":
+                        self.assertIn(value, report)
+                self.assertEqual(self.cli("apply", "--root", self.root, "--plan", out), 0)
+                self.assertEqual(self.cli("rollback", "--root", self.root, "--plan", out), 0)
+                for p in self.root.iterdir():
+                    self.assertEqual(p.read_bytes(), self.original[p.name])
+
+    def test_localized_blocked_reports_never_change_gates(self):
+        self.manifest["components"][0]["review"]["compatibility"][0]["result"] = "unknown"
+        manifest = self.work / "blocked.json"
+        manifest.write_text(json.dumps(self.manifest), encoding="utf-8")
+        for lang in updater.REPORT_TEXT:
+            out = self.work / f"blocked-{lang}.json"
+            self.assertEqual(self.cli("plan", "--root", self.root, "--manifest", manifest,
+                                      "--out", out, "--lang", lang), 2)
+            report = out.with_suffix(".md").read_text(encoding="utf-8")
+            self.assertIn(updater.REPORT_TEXT[lang]["blockers"], report)
+            self.assertIn("**blocked**", report)
+            self.assertEqual(self.cli("apply", "--root", self.root, "--plan", out), 1)
+        for p in self.root.iterdir():
+            self.assertEqual(p.read_bytes(), self.original[p.name])
+
+    def test_localized_reports_preserve_and_escape_multilingual_evidence(self):
+        evidence = "日本語 한국어 中文 <script>alert(1)</script> ![image](https://example.invalid)"
+        self.manifest["components"][0]["review"]["release_notes"][0]["summary"] = evidence
+        plan = self.plan()
+        before = updater.encode_plan(plan)
+        for lang in updater.REPORT_TEXT:
+            report = updater.report(plan, lang)
+            self.assertIn(updater.prose(evidence), report)
+            self.assertNotIn("<script>", report)
+            for item in plan["files"]:
+                self.assertIn(item["diff"].rstrip(), report)
+        self.assertEqual(updater.encode_plan(plan), before)
+        self.assertEqual(updater.report(plan), updater.report(plan, "en"))
+
+    def test_invalid_report_language_rejected_before_writes(self):
+        out = self.work / "invalid.json"
+        with self.assertRaises(SystemExit) as raised:
+            self.cli("plan", "--root", self.root, "--manifest", "missing.json",
+                     "--out", out, "--lang", "invalid")
+        self.assertEqual(raised.exception.code, 2)
+        self.assertFalse(out.exists())
+        self.assertFalse(out.with_suffix(".md").exists())
+        with self.assertRaises(updater.Invalid):
+            updater.report(self.plan(), "invalid")
+
     def test_generic_artifact_preserves_integrity_and_compatibility_gates(self):
         self.manifest["components"][0]["kind"] = "artifact"
         self.assertEqual(self.plan()["status"], "ready")
