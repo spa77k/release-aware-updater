@@ -2,28 +2,28 @@
   "schema_version": 1,
   "components": [
     {
-      "id": "demo-plugin",
-      "kind": "minecraft-plugin",
+      "id": "demo-app",
+      "kind": "artifact",
       "current_version": "1.0.0",
       "candidate_version": "1.1.0",
       "artifact": {
-        "url": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar",
+        "url": "https://downloads.example.invalid/demo-app/1.1.0/demo.tar.gz",
         "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
         "verification": "unverified",
-        "evidence": "REPLACE: record the official source and the exact artifact/digest verification performed."
+        "evidence": "REPLACE: record official source and exact artifact verification."
       },
       "review": {
         "release_notes": [
           {
-            "url": "https://releases.example.invalid/demo-plugin/1.1.0",
-            "summary": "REPLACE: summarize the reviewed upgrade path and link official notes, including intervening releases."
+            "url": "https://releases.example.invalid/demo-app/1.1.0",
+            "summary": "REPLACE: summarize the full reviewed upgrade path."
           }
         ],
         "compatibility": [
           {
-            "target": "Minecraft 1.21.x / Paper / Java 21 / no companion plugins (fictional)",
+            "target": "linux/amd64 / runtime and configuration unchanged (fictional)",
             "result": "unknown",
-            "evidence": "REPLACE: verify the real runtime and dependency requirements using official evidence."
+            "evidence": "REPLACE: verify runtime and dependency requirements."
           }
         ],
         "breaking_changes": [],
@@ -32,26 +32,26 @@
           "PENDING: list relevant checks and replace with actual results as they run."
         ],
         "rollback": [
-          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+          "Restore previous pins; restore a tested database/volume snapshot if a runtime migration occurred."
         ],
         "decision": "blocked",
         "blockers": [
-          "Template only: replace all example URLs, hashes, versions, paths, pin snippets, and review evidence before use."
+          "Template only: replace all fictional values and evidence with researched facts."
         ]
       },
       "edits": [
         {
-          "path": "plugins.json",
+          "path": "artifacts.json",
           "before": "\"version\": \"1.0.0\"",
           "after": "\"version\": \"1.1.0\""
         },
         {
-          "path": "plugins.json",
-          "before": "https://downloads.example.invalid/demo-plugin/1.0.0/demo.jar",
-          "after": "https://downloads.example.invalid/demo-plugin/1.1.0/demo.jar"
+          "path": "artifacts.json",
+          "before": "https://downloads.example.invalid/demo-app/1.0.0/demo.tar.gz",
+          "after": "https://downloads.example.invalid/demo-app/1.1.0/demo.tar.gz"
         },
         {
-          "path": "plugins.json",
+          "path": "artifacts.json",
           "before": "1111111111111111111111111111111111111111111111111111111111111111",
           "after": "2222222222222222222222222222222222222222222222222222222222222222"
         }
@@ -78,7 +78,7 @@
         ],
         "compatibility": [
           {
-            "target": "linux/amd64 / Java 21 / unchanged volume schema and environment contract (fictional)",
+            "target": "linux/amd64 / application configuration and volume schema (fictional)",
             "result": "unknown",
             "evidence": "REPLACE: verify the real runtime and dependency requirements using official evidence."
           }
@@ -89,7 +89,7 @@
           "PENDING: list relevant checks and replace with actual results as they run."
         ],
         "rollback": [
-          "Restore the previous pins before any runtime upgrade. Restore a tested world/database snapshot if a runtime migration occurred."
+          "Restore previous pins; restore a tested database/volume snapshot if a runtime migration occurred."
         ],
         "decision": "blocked",
         "blockers": [

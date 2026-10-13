@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "demo-app",
+      "kind": "artifact",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "url": "https://downloads.example.invalid/demo-app/1.1.0/demo.tar.gz",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "verification": "verified",
+        "evidence": "SYNTHETIC FIXTURE: placeholder SHA-256, no download or real publisher verification. Never reuse as production evidence."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-app/1.1.0",
+            "summary": "Synthetic fixture: fixes login handling; adds an optional metrics setting. No incompatible changes in the fixture release."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "linux/amd64 / runtime and configuration unchanged (fictional)",
+            "result": "pass",
+            "evidence": "Synthetic compatibility statement for offline demonstration only."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "Pending in a real task: validate configuration, isolate startup, and smoke-test login. Fixture tests only check pin editing."
+        ],
+        "rollback": [
+          "Restore previous pins; restore a tested database/volume snapshot if a runtime migration occurred."
+        ],
+        "decision": "ready",
+        "blockers": []
+      },
+      "edits": [
+        {
+          "path": "artifacts.json",
+          "before": "\"version\": \"1.0.0\"",
+          "after": "\"version\": \"1.1.0\""
+        },
+        {
+          "path": "artifacts.json",
+          "before": "https://downloads.example.invalid/demo-app/1.0.0/demo.tar.gz",
+          "after": "https://downloads.example.invalid/demo-app/1.1.0/demo.tar.gz"
+        },
+        {
+          "path": "artifacts.json",
+          "before": "1111111111111111111111111111111111111111111111111111111111111111",
+          "after": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ]
+    },
+    {
+      "id": "demo-server",
+      "kind": "docker-image",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "reference": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "platform": "linux/amd64",
+        "digest_kind": "index",
+        "verification": "verified",
+        "evidence": "SYNTHETIC FIXTURE: placeholder registry index digest, no real registry inspection."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-server/1.1.0",
+            "summary": "Synthetic fixture: fixes login handling; adds an optional metrics setting. No incompatible changes in the fixture release."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "linux/amd64 / unchanged application configuration and volume schema (fictional)",
+            "result": "pass",
+            "evidence": "Synthetic compatibility statement for offline demonstration only."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "Pending in a real task: validate configuration, isolate startup, and smoke-test login. Fixture tests only check pin editing."
+        ],
+        "rollback": [
+          "Restore previous pins; restore a tested database/volume snapshot if a runtime migration occurred."
+        ],
+        "decision": "ready",
+        "blockers": []
+      },
+      "edits": [
+        {
+          "path": "compose.yaml",
+          "before": "ghcr.io/example/demo-server:1.0.0@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "after": "ghcr.io/example/demo-server:1.1.0@sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        }
+      ]
+    },
+    {
+      "id": "demo-library",
+      "kind": "artifact",
+      "current_version": "1.0.0",
+      "candidate_version": "1.1.0",
+      "artifact": {
+        "url": "https://downloads.example.invalid/demo-library/1.1.0/library.zip",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "verification": "verified",
+        "evidence": "SYNTHETIC FIXTURE: placeholder SHA-256, no download or real publisher verification. Never reuse as production evidence."
+      },
+      "review": {
+        "release_notes": [
+          {
+            "url": "https://releases.example.invalid/demo-library/1.1.0",
+            "summary": "Synthetic fixture: fixes a parser edge case; public API remains unchanged in this fictional release."
+          }
+        ],
+        "compatibility": [
+          {
+            "target": "Application public API use / runtime unchanged (fictional)",
+            "result": "pass",
+            "evidence": "Synthetic compatibility statement for offline demonstration only."
+          }
+        ],
+        "breaking_changes": [],
+        "migrations": [],
+        "tests": [
+          "Pending in a real task: run consumer API, unit, and integration tests. Fixture tests only check pin editing."
+        ],
+        "rollback": [
+          "Restore previous pins; restore a tested database/volume snapshot if a runtime migration occurred."
+        ],
+        "decision": "ready",
+        "blockers": []
+      },
+      "edits": [
+        {
+          "path": "library-pins.json",
+          "before": "\"version\": \"1.0.0\"",
+          "after": "\"version\": \"1.1.0\""
+        },
+        {
+          "path": "library-pins.json",
+          "before": "https://downloads.example.invalid/demo-library/1.0.0/library.zip",
+          "after": "https://downloads.example.invalid/demo-library/1.1.0/library.zip"
+        },
+        {
+          "path": "library-pins.json",
+          "before": "1111111111111111111111111111111111111111111111111111111111111111",
+          "after": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ]
+    }
+  ]
+}

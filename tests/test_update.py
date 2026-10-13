@@ -33,6 +33,35 @@ class UpdateTest(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             return updater.main(list(map(str, args)))
 
+    def test_generic_artifact_preserves_integrity_and_compatibility_gates(self):
+        self.manifest["components"][0]["kind"] = "artifact"
+        self.assertEqual(self.plan()["status"], "ready")
+        self.manifest["components"][0]["artifact"]["verification"] = "unverified"
+        plan = self.plan()
+        self.assertEqual(plan["status"], "blocked")
+        with self.assertRaises(updater.Invalid):
+            updater.mutate(self.root, plan)
+        self.manifest["components"][0]["artifact"]["verification"] = "verified"
+        self.manifest["components"][0]["review"]["compatibility"][0]["result"] = "unknown"
+        self.assertEqual(self.plan()["status"], "blocked")
+        self.manifest["components"][0]["artifact"]["sha256"] = "bad"
+        with self.assertRaises(updater.Invalid):
+            self.plan()
+
+    def test_generic_demo_application_library_container_round_trip(self):
+        root = self.work / "general"
+        shutil.copytree(REPO / "examples/general", root)
+        manifest = json.loads((REPO / "examples/general-manifest.json").read_text())
+        before = {p.name: p.read_bytes() for p in root.iterdir()}
+        plan = updater.build_plan(root, manifest)
+        self.assertEqual(plan["status"], "ready")
+        self.assertEqual(updater.mutate(root, plan), 3)
+        self.assertEqual(updater.mutate(root, plan), 0)
+        for p in root.iterdir():
+            self.assertIn(b"1.1.0", p.read_bytes())
+        self.assertEqual(updater.mutate(root, plan, reverse=True), 3)
+        self.assertEqual({p.name: p.read_bytes() for p in root.iterdir()}, before)
+
     def test_plan_does_not_mutate_and_is_deterministic(self):
         plan = self.plan()
         self.assertEqual(plan, self.plan())

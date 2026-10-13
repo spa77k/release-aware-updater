@@ -1,6 +1,6 @@
 ---
 name: release-aware-updater
-description: Review upstream release notes and compatibility before updating Minecraft plugin/JAR pins or Docker image pins. Produce an evidence-backed plan, minimal diff, validation, and rollback steps. Use for plugin or container update requests, including リリースノートを読んで更新. Does not upgrade the Docker engine or deploy servers.
+description: Review upstream release notes and compatibility before updating applications, libraries, package dependencies, or Docker images. Produce an evidence-backed plan, minimal diff, validation, and rollback steps. Use for dependency upgrades and リリースノートを読んで更新. Minecraft plugins are an optional specialization; deployment is separate.
 license: MIT
 ---
 
@@ -17,15 +17,18 @@ requires Python 3.11+, with no extra packages or Docker daemon.
 ## Establish the actual target
 
 - Inspect project instructions and the requested pin/config files. Record current
-  versions, source projects, Minecraft version, server implementation, Java
-  runtime, plugin dependencies, image platforms, and persistent data.
+  versions, source projects, language/runtime and OS/CPU requirements, package
+  manager and lockfiles, dependency constraints, image platforms, and persistent
+  data. For Minecraft only, also record server/API, Java, and plugin requirements.
 - Separate what is pinned in Git from what is actually running. If runtime access
-  is unavailable, state that and do not claim the running server was inspected.
+  is unavailable, state that and do not claim the running application was inspected.
 - Infer target files from the repository when unambiguous. Ask only for missing
   choices that affect compatibility or scope. Preserve local/unrelated changes.
-- This skill covers plugin JAR pins and container image references. Docker Engine,
-  Compose CLI upgrades, modpacks, arbitrary OS packages, and live server
-  deployment need their own workflow. Do not quietly broaden the request.
+- This skill covers application and library upgrades, package dependencies,
+  downloadable artifact pins, and container image references. The optional helper
+  supports only HTTPS URL + SHA-256 and image digest pins; it is not a package
+  resolver. Docker Engine, OS upgrades, and live deployment need their own
+  workflow. Do not quietly broaden the request.
 
 ## Read before choosing
 
@@ -41,8 +44,9 @@ requested a prerelease. Do not sort arbitrary version strings or equate GitHub's
 Record:
 
 - Exact current and proposed versions, official source links, and what changed
-- Minecraft/server API and Java requirements; dependencies and configuration
-  changes for plugins; OS/CPU platform, entrypoint, ports, environment variables,
+- Public API/ABI changes, language/runtime requirements, direct/transitive and
+  peer dependency constraints, configuration and lockfile changes; for Minecraft,
+  server API and Java requirements; OS/CPU platform, entrypoint, ports, environment variables,
   volume/database format, and image variants for containers
 - Breaking changes, required intermediate steps, known regressions, deprecations,
   and security fixes relevant to this project
@@ -74,12 +78,22 @@ Planning is offline; it does not fetch or interpret release notes. Its checks
 validate supplied assertions and pin structure, not the truth of the research.
 Do not mark evidence as verified just to satisfy the schema.
 
-Use exact new JAR URLs plus SHA-256 pins and image references with SHA-256
+Use exact new artifact URLs plus SHA-256 pins and image references with SHA-256
 digests. If the repository's format cannot represent these safely, explain the
 limitation and prepare a normal reviewable diff instead of changing its format
 without permission. Do not duplicate a checksum that no loader ever validates.
 For configuration migrations, prepare separate explicit edits and tests; the
 pin helper does not perform migrations.
+
+For package-manager dependencies (for example npm, pip, Cargo, Maven, or Gradle),
+use the repository's established manager and lockfile workflow instead of forcing
+them into the helper manifest. Review exact resolved versions, transitive changes,
+peer constraints, registry/source identity, and native integrity metadata. Do not
+hand-edit generated lockfiles or relabel other checksum algorithms as SHA-256.
+Only run resolution/install commands within the user's and host's authority;
+review lifecycle/build scripts and network effects before execution. If execution
+is unavailable, provide the proposed manifest diff and mark lockfile generation
+and tests pending. Do not claim a dependency update is complete with a stale lockfile.
 
 ## Apply only within the requested authority
 
@@ -102,6 +116,8 @@ those actions. An authorized push is separate from a successful local update.
   and version all refer to the same intended artifact. Avoid printing secrets
   from environment interpolation.
 - Build/test in an isolated environment when authorized and available. For
+  applications/libraries, run relevant unit/integration tests, type checks, API
+  usage checks, and builds; inspect resolved dependency/lockfile changes. For
   plugins, check loading, dependency ordering, startup logs, and a representative
   function. For images, check health, exposed interfaces, and persistent state
   compatibility. Never use production data as an implicit test fixture.
@@ -110,7 +126,7 @@ those actions. An authorized push is separate from a successful local update.
   repository update with runtime validation pending.
 - Keep previous artifact pins and a tested backup/restore approach for state.
   If data or config migration is irreversible, identify the restore boundary
-  before it runs. Changing a pin back does not undo a world/database migration.
+  before it runs. Changing a pin back does not undo a database or other persistent-data migration.
 
 For unchanged local pin files, the helper can reverse its own changes:
 

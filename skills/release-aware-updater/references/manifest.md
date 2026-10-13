@@ -1,7 +1,7 @@
 # Manifest and helper contract
 
 Python 3.11+ and the standard library only. The helper never uses the network,
-spawns a process, invokes Docker, downloads a JAR, or executes manifest strings.
+spawns a process, invokes Docker, downloads an artifact, or executes manifest strings.
 The agent researches release notes using its own authorized tools and provides
 the evidence. Start from [manifest-template.json](manifest-template.json) in this
 installed skill. Its placeholders are intentionally blocked: replace them with
@@ -17,16 +17,19 @@ component has these required fields; unknown fields are rejected to catch typos.
 | Field | Meaning |
 | --- | --- |
 | `id` | Unique lowercase kebab-case identifier |
-| `kind` | `minecraft-plugin` or `docker-image` |
+| `kind` | `artifact`, `docker-image`, or legacy `minecraft-plugin` |
 | `current_version` / `candidate_version` | Exact upstream labels, not automatically compared or sorted |
 | `artifact` | Candidate identity and integrity fields below |
 | `review` | Research and decision fields below |
 | `edits` | Nonempty array of `{ "path", "before", "after" }` exact-text edits |
 
-For a plugin, `artifact` is `{ "url", "sha256", "verification", "evidence" }`.
+For a downloadable application/library (`artifact`), `artifact` is `{ "url", "sha256", "verification", "evidence" }`.
 URL must be HTTPS without embedded credentials; SHA-256 is 64 lowercase hex
 characters. Both must appear in the proposed replacement text. Verify the
-repository actually enforces its checksum pin.
+repository actually enforces its checksum pin. `minecraft-plugin` retains the
+same URL + SHA-256 contract for backward compatibility. Use the repository's
+package manager for registry dependencies and lockfiles; this schema does not
+resolve npm/pip/Cargo/Maven/Gradle packages.
 
 For an image, `artifact` is `{ "reference", "platform", "digest_kind",
 "verification", "evidence" }`. `reference` must end in `@sha256:<64 lowercase
@@ -66,7 +69,7 @@ file. Include enough surrounding text to disambiguate repeated versions. Each
 `after` must be uniquely reversible as well. Multiple nonoverlapping edits can
 share a file. These snippets are literal text, not regex or executable code.
 YAML/Compose/env/Dockerfile/JSON are handled as UTF-8 text without reformatting;
-syntax-specific validation is the agent's responsibility. Binary JAR replacement
+syntax-specific validation is the agent's responsibility. Binary artifact replacement
 and automatic configuration/data migrations are deliberately unsupported.
 
 The helper refuses absolute/traversing paths, VCS internals, symlink components,

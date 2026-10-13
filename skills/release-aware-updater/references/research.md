@@ -1,22 +1,36 @@
 # Evidence and artifact checks
 
-## Minecraft plugin/JAR updates
+## Package-manager libraries and dependencies
+
+- Identify the actual package, official registry, repository, and release notes;
+  similarly named packages are not interchangeable. Follow every relevant major
+  release and migration guide between the current and proposed resolved version.
+- Check language/runtime support, public API/ABI usage, peer/optional dependencies,
+  transitive changes, and platform-specific builds. A newer version or successful
+  resolver run is not evidence that the application remains compatible.
+- Use the project's established package manager to update manifests and generated
+  lockfiles together when authorized. Preserve native integrity/checksum fields
+  and source registries. The offline helper does not resolve package versions or
+  regenerate npm/pip/Cargo/Maven/Gradle lockfiles.
+- Review install/build hooks before running commands. Run the project's tests,
+  type checks, and build where authorized; explicitly mark unavailable checks.
+  Reverting a lockfile does not undo installed environments or data migrations.
+
+## Downloadable applications and libraries
 
 1. Establish the actual upstream project and distribution channel from repository
    history or the publisher's site. Similar names and unofficial mirrors are not
-   sufficient. Some plugins publish on GitHub; others use Modrinth, Hangar,
-   SpigotMC, or a vendor portal. Use an available official API or read the official
-   page. No universal release scraper is bundled.
-2. Read candidate and intervening release notes. Match Minecraft version, server
-   implementation (Paper/Spigot/Folia/Velocity/etc.), Java version, and required
-   companion plugins. Folia support and proxy/server compatibility are separate
-   facts; never infer them from a generic “Minecraft plugin” label.
+   sufficient. Use the vendor's official release API or download page. No
+   universal release scraper is bundled.
+2. Read candidate and intervening release notes. Match the language/runtime,
+   OS/CPU, API/ABI, configuration, and dependency requirements. Check removals,
+   changed defaults, data migrations, and intermediate upgrade requirements.
 3. Select the actual binary artifact, not a source archive, installer, dev build,
    or similarly named asset. Record the immutable release/version identifier,
    asset name and official download URL. An API listing alone is not release-note
    review. GitHub `latest` is not a compatibility resolver.
-4. Check publisher-provided hashes/signatures when available. GitHub asset
-   metadata may expose a digest; Modrinth file objects document hashes. Preserve
+4. Check publisher-provided hashes/signatures when available. Release asset
+   metadata may expose a digest. Preserve
    the algorithm rather than relabeling SHA-1 or SHA-512 as SHA-256. If only another
    trusted algorithm is supplied, verify it first and then compute SHA-256 from
    the same bytes for the pin. Do not invent a digest when metadata is missing.
@@ -25,14 +39,13 @@
    hash it locally. The helper can compare the bytes to a known SHA-256:
 
    ```sh
-   python3 <skill-dir>/scripts/update.py sha256 <downloaded.jar> --expected <sha256>
+   python3 <skill-dir>/scripts/update.py sha256 <downloaded-artifact> --expected <sha256>
    ```
 
 A locally computed checksum fixes the bytes for future reproducibility; by
 itself it does not authenticate the publisher. Record the official source and
 the exact verification performed, including absent signatures/checksums. Respect
-the host's download/install permissions. Never place a downloaded JAR directly
-into a live server directory as an implicit test.
+the host's download/install permissions. Never replace a live application binary as an implicit test.
 
 ## Docker images
 
@@ -50,9 +63,19 @@ into a live server directory as an implicit test.
   Docker image ID/config digest is not the registry manifest digest.
 - Pin the verified digest returned by the registry; do not hash release-note
   text, a displayed JSON document, or a tag string to create a substitute.
-- Read database/world format changes and downgrade limitations. Persistent
+- Read database or persistent-data format changes and downgrade limitations. Persistent
   volumes remain changed even if an earlier image starts. Preserve a restorable
   snapshot and document the compatible previous image.
+
+## Optional specialization: Minecraft plugins/JARs
+
+Use the artifact checks above plus Minecraft version, server implementation
+(Paper/Spigot/Folia/Velocity/etc.), Java version, and companion plugin requirements.
+Folia and proxy/server support are separate facts. Use the publisher's verified
+GitHub, Modrinth, Hangar, SpigotMC, or vendor channel; select the actual plugin
+binary and check loading, dependency order, startup logs, and a representative
+function. Never place it into a live server as an implicit test. World migrations
+need separate backups; pin rollback does not restore worlds.
 
 ## Source failure and uncertainty
 

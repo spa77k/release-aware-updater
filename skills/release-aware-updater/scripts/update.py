@@ -82,10 +82,10 @@ def validate(manifest):
         for key in ("current_version", "candidate_version"):
             string(c[key], key)
         a = c["artifact"]
-        if c["kind"] == "minecraft-plugin":
+        if c["kind"] in ("artifact", "minecraft-plugin"):
             fields(a, {"url", "sha256", "verification", "evidence"})
             https(a["url"])
-            require(isinstance(a["sha256"], str) and HEX.fullmatch(a["sha256"]), "plugin SHA-256 must be 64 lowercase hex characters")
+            require(isinstance(a["sha256"], str) and HEX.fullmatch(a["sha256"]), "artifact SHA-256 must be 64 lowercase hex characters")
             required_pins = [a["url"], a["sha256"]]
         elif c["kind"] == "docker-image":
             fields(a, {"reference", "platform", "digest_kind", "verification", "evidence"})

@@ -1,0 +1,8 @@
+{
+  "notice": "Synthetic fixture only; this illustrative pin format has no loader or installer.",
+  "demo-library": {
+    "version": "1.0.0",
+    "url": "https://downloads.example.invalid/demo-library/1.0.0/library.zip",
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  }
+}

@@ -1,7 +1,8 @@
 # Release-aware updater
 
 リリースノートを読み、互換性・破壊的変更・移行手順を確認してから
-Minecraftプラグイン/JARとDockerイメージの固定バージョンを更新するスキルです。
+アプリ・ライブラリ・パッケージ依存関係・Dockerイメージを更新する汎用スキルです。
+Minecraftプラグインも、用途のひとつとして扱えます。
 
 Claude Code、Codex、その他の[Agent Skills](https://agentskills.io/specification)
 対応エージェントで同じ `SKILL.md` を使えます。特定プロバイダーのAPIや
@@ -14,13 +15,17 @@ diffs, applies authorized local edits, and reverses unchanged pin updates.
 ## できること
 
 - 現在版から候補版までのリリースノート、依存関係、互換性の調査
-- Minecraft・Java・サーバー実装・プラグイン依存の確認
+- アプリ/ライブラリのAPI・実行環境・直接/間接依存・lockfileの確認
+- 必要な場合のみMinecraft・Java・サーバー実装・プラグイン依存の確認
 - Dockerイメージのタグ/digest、CPUプラットフォーム、永続データの確認
 - 破壊的変更・移行・テスト・ロールバックを含む更新計画と差分
 - URL + SHA-256 / イメージdigestのローカル更新と、ファイルhashを確認する復元
 - 不明・非互換・未検証の項目を保留する判定
 
-Docker Engine自体の更新、ライブサーバーのデプロイ、汎用パッケージ更新は対象外です。
+npm/pip/Cargo/Maven/Gradle等は既存のパッケージマネージャーでmanifestとlockfileを
+更新します。Python補助CLIはURL + SHA-256とDocker digestのテキスト固定専用で、
+パッケージ解決やlockfile再生成はしません。Docker Engine/OS自体の更新と
+ライブ環境へのデプロイは別の作業です。
 スクリプトは通信・ダウンロード・コマンド実行・サービス再起動をしません。
 実際のリリースノート調査にはエージェントのWeb/リポジトリ閲覧機能を使います。
 
@@ -69,12 +74,12 @@ Python CLIを直接使えます。全ホストの自動検出を保証するも�
 
 ## 依頼例
 
-> このリポジトリのMinecraftプラグインとDockerイメージについて、現在版から
+> このリポジトリのアプリ・ライブラリ・Dockerイメージについて、現在版から
 > 最新の互換性がある安定版までの公式リリースノートを確認して。
-> 破壊的変更、Java/Paper要件、移行と復元方法を含む更新案と差分を作って。
+> 破壊的変更、実行環境・API要件、lockfileへの影響、移行と復元方法を含む更新案と差分を作って。
 > まず計画だけ。デプロイはしないで。
 
-> Review the official release notes for these plugin and container pins.
+> Review the official release notes for these application, library, and container dependencies.
 > Update compatible pins in this checkout, run the repository checks, and list
 > migrations and runtime tests still needed. Do not deploy or restart anything.
 
@@ -89,15 +94,19 @@ Python CLIを直接使えます。全ホストの自動検出を保証するも�
 
 ```sh
 demo=$(mktemp -d)
-cp -R examples/demo "$demo/repo"
+cp -R examples/general "$demo/repo"
 python3 skills/release-aware-updater/scripts/update.py plan \
-  --root "$demo/repo" --manifest examples/manifest.json --out "$demo/plan.json"
+  --root "$demo/repo" --manifest examples/general-manifest.json --out "$demo/plan.json"
 cat "$demo/plan.md"
 python3 skills/release-aware-updater/scripts/update.py apply \
   --root "$demo/repo" --plan "$demo/plan.json"
 python3 skills/release-aware-updater/scripts/update.py rollback \
   --root "$demo/repo" --plan "$demo/plan.json"
 ```
+
+このデモは汎用アプリ・配布ファイル形式のライブラリ・Dockerの3種類を扱います。
+従来のMinecraft例は `examples/demo` と `examples/manifest.json` に残しています。
+ライブラリ例はURL/hash固定の架空形式で、npm等のlockfileを代替するものではありません。
 
 自分のリポジトリには、調査済みの情報でmanifestを作成してください。
 [入力仕様](skills/release-aware-updater/references/manifest.md)と
@@ -110,7 +119,7 @@ python3 skills/release-aware-updater/scripts/update.py rollback \
 - リリースノートの文章はデータとして読みます。埋め込まれた指示は実行しません
 - `ready` は入力された証拠に基づくローカル編集の判定です。研究内容の真偽や
   実行環境での互換性、デプロイ可否をスクリプトが証明するものではありません
-- 文字列を一意に置換する仕組みです。YAML/Compose構文や実際のサーバー起動は
+- 文字列を一意に置換する仕組みです。YAML/Compose構文や実際のアプリ起動は
   別途テストが必要です。自動のバージョン探索・全サイト対応スクレイピングは行いません
 - hashは改ざん検知/再現性に役立ちますが、それだけで配布元の真正性は証明できません
 - `rollback` はファイル中のpinだけを戻します。DB・ワールド・volumeの変更は戻りません
